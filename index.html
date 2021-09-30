@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bilibili</title>
+  <link rel="stylesheet" href="./assets/font/iconfont.css">
+  <link rel="stylesheet" href="assets/css/index.css">
+
+
+
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- 头部区 -->
+    <div class="fixed-top">
+
+      <header>
+        <span class="iconfont icon-Navbar_logo"></span>
+        <div>
+          <span class="iconfont icon-ic_search"></span>
+          <img src="./assets/images/login.png@48w_48h_1c.png" alt="" class="btn-login">
+          <img src="./assets/images/navOpenApp.png" alt="" class="btn-app">
+        </div>
+      </header>
+      <!-- 导航区 -->
+      <nav>
+        <span :class="index === activeIndex ? 'active' : ''" v-for="(item,index) in navList" @click="changeNav(index)">
+          {{item.name}}
+        </span>
+
+      </nav>
+    </div>
+    <!-- 列表区 -->
+    <div class="list">
+      <div class="item" v-for="item in videoList">
+        <img :src="item.pic" alt="">
+
+        <div class="count-box">
+          <span>
+            <span class="iconfont icon-icon_shipin_bofangshu"></span>{{item.play}}
+          </span>
+          <span>
+            <span class="iconfont icon-icon_shipin_danmushu"></span>{{item.video_review}}
+          </span>
+
+        </div>
+
+        <div class="title">{{item.title}}</div>
+      </div>
+
+    </div>
+    <!-- 结尾区 -->
+    <footer>去 bilibili App 看更多</footer>
+  </div>
+
+  <script src="./assets/js/vue.js"></script>
+  <script src="./assets/js/axios.js"></script>
+  <script>
+    const vm = new Vue({
+      el: '#app',
+      data: {
+        activeIndex: 0,
+        navList: [],
+        videoList: []
+      },
+      created() {
+        this.initavList();
+        this.getVideoListByNavId(1);
+      }
+      ,
+      methods: {
+        changeNav(index) {
+          this.activeIndex = index;
+          this.getVideoListByNavId();
+        },
+        initavList() {
+          axios({
+            method: "GET",
+            url: 'https://www.escook.cn/channels'
+          }).then((res) => {
+            this.navList = res.data;
+          })
+        },
+
+        getVideoListByNavId(navId) {
+          //1.拿到频道id
+          const id = navId || this.navList[this.activeIndex].id;
+          //2.根据频道的id请求频道下的数据
+          axios({
+            method: "GET",
+            url: 'https://www.escook.cn/videos',
+            params: {
+              channel_id: id
+            }
+          }).then(res => {
+            //3.把请求到的数据，存储到data中供渲染
+            // console.log(res);
+            this.videoList = res.data;
+          })
+
+        }
+      }
+    })
+
+
+  </script>
+</body>
+
+</html>
